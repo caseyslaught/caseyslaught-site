@@ -3,8 +3,8 @@ import styled from "styled-components";
 export const StyledExperiences = styled.div`
   flex: 2;
   min-width: 0;
-  height: 100%;
   text-align: left;
+  height: 100%;
 
   .experience-title-wrapper {
     margin: 0px;
