@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronDown, ChevronUp } from "react-feather";
-import { useSpring, a, config } from "react-spring";
+import { useSpring } from "react-spring";
 import { useMeasure } from "react-use";
 
 import { StyledExperienceItem, StyledContent } from "./styles";
