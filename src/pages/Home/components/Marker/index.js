@@ -4,7 +4,8 @@ import { Marker as MapBoxMarker } from "react-map-gl";
 import { StyledMarker } from "./styles";
 
 const Marker = ({ item, isSelected, setSelectedItem }) => {
-  const { latitude, longitude, organization } = item;
+  const { marker_organization, longitude, latitude } = item;
+
   return (
     <MapBoxMarker latitude={latitude} longitude={longitude} captureClick={true}>
       <StyledMarker
@@ -17,7 +18,7 @@ const Marker = ({ item, isSelected, setSelectedItem }) => {
           }
         }}
       >
-        {organization}
+        {marker_organization}
       </StyledMarker>
     </MapBoxMarker>
   );

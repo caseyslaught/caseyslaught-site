@@ -1,23 +1,35 @@
 import React from "react";
+import { Spin } from "antd";
 
 import ExperienceItem from "../ExperienceItem";
 import { StyledExperiences } from "./styles";
 
-const Experiences = ({ defaultExperiences, selectedItem, setSelectedItem }) => {
-  const [experiences, setExperiences] = React.useState(
-    defaultExperiences.map((item) => ({ isOpen: false, ...item }))
-  );
+const Experiences = ({
+  experiences,
+  isLoading,
+  selectedItem,
+  setSelectedItem,
+}) => {
+  const [experienceItems, setExperienceItems] = React.useState([]);
+
+  React.useEffect(() => {
+    if (experiences && experiences.length > 0) {
+      setExperienceItems(
+        experiences.map((item) => ({ ...item, isOpen: false }))
+      );
+    }
+  }, [experiences]);
 
   React.useEffect(() => {
     if (selectedItem) {
-      setExperiences((prevExperiences) => {
+      setExperienceItems((prevExperiences) => {
         return prevExperiences.map((item) => ({
           ...item,
           isOpen: item.id === selectedItem.id,
         }));
       });
     } else {
-      setExperiences((prevExperiences) => {
+      setExperienceItems((prevExperiences) => {
         return prevExperiences.map((item) => ({
           ...item,
           isOpen: false,
@@ -30,7 +42,7 @@ const Experiences = ({ defaultExperiences, selectedItem, setSelectedItem }) => {
     if (selectedItem === null || targetItem.id !== selectedItem.id) {
       setSelectedItem(targetItem);
     }
-    setExperiences((prevExperiences) => {
+    setExperienceItems((prevExperiences) => {
       return prevExperiences.map((item) => ({
         ...item,
         isOpen: item.id === targetItem.id,
@@ -40,7 +52,7 @@ const Experiences = ({ defaultExperiences, selectedItem, setSelectedItem }) => {
 
   const setItemCollapsed = (targetItem) => {
     setSelectedItem(null);
-    setExperiences((prevExperiences) => {
+    setExperienceItems((prevExperiences) => {
       return prevExperiences.map((item) => {
         if (item.id === targetItem.id) {
           return { ...item, isOpen: false };
@@ -52,20 +64,24 @@ const Experiences = ({ defaultExperiences, selectedItem, setSelectedItem }) => {
   };
 
   return (
-    <StyledExperiences>
+    <StyledExperiences isLoading={isLoading}>
       <div className="experience-title-wrapper">
         <h3 className="experience-title">Experiences</h3>
       </div>
       <div className="experience-list-wrapper">
-        {experiences.map((item) => (
-          <ExperienceItem
-            key={item.id}
-            item={item}
-            isSelected={selectedItem && selectedItem.id === item.id}
-            setItemExpanded={setItemExpanded}
-            setItemCollapsed={setItemCollapsed}
-          />
-        ))}
+        {isLoading ? (
+          <Spin />
+        ) : (
+          experienceItems.map((item) => (
+            <ExperienceItem
+              key={item.id}
+              item={item}
+              isSelected={selectedItem && selectedItem.id === item.id}
+              setItemExpanded={setItemExpanded}
+              setItemCollapsed={setItemCollapsed}
+            />
+          ))
+        )}
       </div>
     </StyledExperiences>
   );

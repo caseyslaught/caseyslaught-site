@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { animated } from "react-spring";
 
 export const StyledExperienceItem = styled.div`
   display: flex;
@@ -62,6 +61,10 @@ export const StyledExperienceItem = styled.div`
     background: #16548a;
   }
 
+  .tag-education {
+    background: #16548a;
+  }
+
   .item-expand-wrapper {
     width: 100%;
     text-align: center;
@@ -72,11 +75,18 @@ export const StyledExperienceItem = styled.div`
     color: #aaaaaa;
     font-size: 0.8em;
   }
-`;
 
-export const StyledContent = styled(animated.div)`
-  overflow: hidden;
-  font-size: 1em;
-  color: #555555;
-  margin-bottom: ${(props) => (props.isOpen ? "20px" : "0px")};
+  .expanded-content {
+    overflow: hidden;
+    font-size: 1em;
+    color: #555555;
+    margin-bottom: ${(props) => (props.isOpen ? "20px" : "0px")};
+  }
+
+  .organization-description {
+    margin-bottom: 10px;
+  }
+
+  .role-list {
+  }
 `;

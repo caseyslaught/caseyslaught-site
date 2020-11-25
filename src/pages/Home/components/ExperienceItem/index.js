@@ -1,12 +1,30 @@
 import React from "react";
 import { ChevronDown, ChevronUp } from "react-feather";
-import { useSpring } from "react-spring";
+import { useSpring, animated } from "react-spring";
 import { useMeasure } from "react-use";
 
-import { StyledExperienceItem, StyledContent } from "./styles";
+import { StyledExperienceItem } from "./styles";
 
 const ExperienceItem = ({ item, setItemExpanded, setItemCollapsed }) => {
-  const isOpen = item.isOpen;
+  const {
+    isOpen,
+    title,
+    organization,
+    organization_description,
+    role_description,
+    start_date,
+    end_date,
+  } = item;
+
+  const start_obj = new Date(start_date);
+  const start = "Jan " + start_obj.getFullYear();
+
+  let end = "present";
+  if (end_date) {
+    const end_obj = new Date(end_date);
+    end = "Jul " + end_obj.getFullYear();
+  }
+
   const [ref, { height }] = useMeasure();
   const [contentHeight, setContentHeight] = React.useState(0);
   const expand = useSpring({
@@ -20,24 +38,33 @@ const ExperienceItem = ({ item, setItemExpanded, setItemCollapsed }) => {
   }, [height]);
 
   return (
-    <StyledExperienceItem>
+    <StyledExperienceItem isOpen={isOpen}>
       <div className="item-title-wrapper">
         <div className="item-title">
-          {item.title} @ {item.organization}
+          {title} @ {organization}
         </div>
         <div className="item-location">{item.location}</div>
       </div>
       <div className="item-date-range">
-        {item.start_date} - {"present"}
+        {start} - {end}
       </div>
 
-      <StyledContent style={expand} isOpen={isOpen}>
-        <div ref={ref}>{item.description}</div>
-      </StyledContent>
+      <animated.div style={expand} className="expanded-content">
+        <div ref={ref}>
+          <div className="organization-description">
+            {organization_description}
+          </div>
+          <ul className="role-list">
+            {role_description.map((role) => (
+              <li key={role}>{role}</li>
+            ))}
+          </ul>
+        </div>
+      </animated.div>
 
       <div className="item-tags-wrapper">
         {item.tags.map((tag) => (
-          <div key={tag} className={"tag tag-" + tag}>
+          <div key={tag} className={"tag tag-" + tag.toLowerCase()}>
             {tag}
           </div>
         ))}
