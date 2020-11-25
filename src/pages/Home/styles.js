@@ -5,6 +5,7 @@ export const StyledHome = styled.div`
   height: 100%;
   display: flex;
   flex-direction: row;
+  overflow: ${(props) => (props.isMobile ? "visible" : "hidden")};
   background: ${(props) => (props.isMobile ? "inherit" : "white")};
 
   border: ${(props) => (props.isMobile ? "none" : "1px solid #fafafa")};

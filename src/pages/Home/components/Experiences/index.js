@@ -3,13 +3,33 @@ import React from "react";
 import ExperienceItem from "../ExperienceItem";
 import { StyledExperiences } from "./styles";
 
-const Experiences = ({ defaultExperiences }) => {
-  console.log("defaultExperiences", defaultExperiences);
+const Experiences = ({ defaultExperiences, selectedItem, setSelectedItem }) => {
   const [experiences, setExperiences] = React.useState(
     defaultExperiences.map((item) => ({ isOpen: false, ...item }))
   );
 
+  React.useEffect(() => {
+    if (selectedItem) {
+      setExperiences((prevExperiences) => {
+        return prevExperiences.map((item) => ({
+          ...item,
+          isOpen: item.id === selectedItem.id,
+        }));
+      });
+    } else {
+      setExperiences((prevExperiences) => {
+        return prevExperiences.map((item) => ({
+          ...item,
+          isOpen: false,
+        }));
+      });
+    }
+  }, [selectedItem]);
+
   const setItemExpanded = (targetItem) => {
+    if (selectedItem === null || targetItem.id !== selectedItem.id) {
+      setSelectedItem(targetItem);
+    }
     setExperiences((prevExperiences) => {
       return prevExperiences.map((item) => ({
         ...item,
@@ -19,6 +39,7 @@ const Experiences = ({ defaultExperiences }) => {
   };
 
   const setItemCollapsed = (targetItem) => {
+    setSelectedItem(null);
     setExperiences((prevExperiences) => {
       return prevExperiences.map((item) => {
         if (item.id === targetItem.id) {
@@ -40,6 +61,7 @@ const Experiences = ({ defaultExperiences }) => {
           <ExperienceItem
             key={item.id}
             item={item}
+            isSelected={selectedItem && selectedItem.id === item.id}
             setItemExpanded={setItemExpanded}
             setItemCollapsed={setItemCollapsed}
           />

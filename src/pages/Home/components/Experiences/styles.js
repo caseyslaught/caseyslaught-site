@@ -6,6 +6,15 @@ export const StyledExperiences = styled.div`
   text-align: left;
   height: 100%;
 
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  ::-webkit-scrollbar {
+    /* WebKit */
+    width: 0;
+    height: 0;
+  }
+
   .experience-title-wrapper {
     margin: 0px;
     padding: 20px;
