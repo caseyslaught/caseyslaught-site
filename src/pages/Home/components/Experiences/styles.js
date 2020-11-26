@@ -8,16 +8,7 @@ export const StyledExperiences = styled.div`
   display: flex;
   flex-direction: column;
 
-  overflow-y: scroll;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-  ::-webkit-scrollbar {
-    /* WebKit */
-    width: 0;
-    height: 0;
-  }
-
-  .experience-title-wrapper {
+  .experience-header-wrapper {
     margin: 0px;
     padding: 20px;
     border-bottom: 1px solid #cccccc;
@@ -28,6 +19,11 @@ export const StyledExperiences = styled.div`
     color: #555555;
   }
 
+  .experience-filter-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
   .experience-list-wrapper {
     flex: 1;
     padding: 20px;
@@ -35,5 +31,14 @@ export const StyledExperiences = styled.div`
     flex-direction: column;
     align-items: ${(props) => (props.isLoading ? "center" : "stretch")};
     justify-content: ${(props) => (props.isLoading ? "center" : "flex-start")};
+
+    overflow-y: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    ::-webkit-scrollbar {
+      /* WebKit */
+      width: 0;
+      height: 0;
+    }
   }
 `;

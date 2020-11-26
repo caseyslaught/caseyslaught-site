@@ -1,6 +1,7 @@
 import React from "react";
 import { Spin } from "antd";
 
+import MultiSelectFilter from "../../../../components/MultiSelectFilter";
 import ExperienceItem from "../ExperienceItem";
 import { StyledExperiences } from "./styles";
 
@@ -9,6 +10,7 @@ const Experiences = ({
   isLoading,
   selectedItem,
   setSelectedItem,
+  onUpdateCategories,
 }) => {
   const [experienceItems, setExperienceItems] = React.useState([]);
 
@@ -65,8 +67,30 @@ const Experiences = ({
 
   return (
     <StyledExperiences isLoading={isLoading}>
-      <div className="experience-title-wrapper">
+      <div className="experience-header-wrapper">
         <h3 className="experience-title">Experiences</h3>
+        <div className="experience-filter-wrapper">
+          <MultiSelectFilter
+            name="Category"
+            options={[
+              "Conservation",
+              "Education",
+              "Entrepreneurship",
+              "Retail",
+              "Software",
+            ]}
+            placement="bottomLeft"
+            onUpdateOptions={onUpdateCategories}
+          />
+          {/* 
+          <MultiSelectFilter
+            name="Status"
+            options={["Complete", "Ongoing", "Planned"]}
+            placement={isMobile ? "bottom" : "bottomLeft"}
+            onUpdateOptions={onUpdateStatus}
+          />
+          */}
+        </div>
       </div>
       <div className="experience-list-wrapper">
         {isLoading ? (

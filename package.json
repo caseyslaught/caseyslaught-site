@@ -7,6 +7,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "antd": "^4.8.5",
+    "lodash": "^4.17.20",
     "prismic-javascript": "^3.0.2",
     "prismic-reactjs": "^1.3.3",
     "react": "^16.13.1",

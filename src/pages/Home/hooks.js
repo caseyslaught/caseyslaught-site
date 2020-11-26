@@ -15,25 +15,23 @@ export const useExperiences = () => {
       );
       setIsLoading(false);
       if (response) {
+        console.log(response.results);
         setExperiences(
-          response.results.map((item) => ({
-            id: item.id,
-            title: item.data.title[0].text,
-            organization: item.data.organization[0].text,
-            marker_organization: item.data.marker_organization[0].text,
-            organization_url: item.data.organization_link.url,
-            organization_description:
-              item.data.organization_description[0].text,
-            location: item.data.location[0].text,
-            role_description: item.data.role_description.map(
-              (desc) => desc.text
-            ),
-            start_date: item.data.start_date,
-            end_date: item.data.end_date,
-            tags: [item.data.tags],
-            latitude: item.data.coordinates.latitude,
-            longitude: item.data.coordinates.longitude,
-            image: item.data.image,
+          response.results.map(({ id, data }) => ({
+            id,
+            title: data.title[0].text,
+            organization: data.organization[0].text,
+            marker_organization: data.marker_organization[0].text,
+            organization_url: data.organization_link.url,
+            organization_description: data.organization_description[0].text,
+            location: data.location[0].text,
+            role_description: data.role_description.map((desc) => desc.text),
+            start_date: data.start_date,
+            end_date: data.end_date,
+            tags: data.tags.map((tag) => tag.text),
+            latitude: data.coordinates.latitude,
+            longitude: data.coordinates.longitude,
+            image: data.image,
           }))
         );
       }

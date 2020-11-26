@@ -28,12 +28,11 @@ export const StyledExperienceItem = styled.div`
   .item-date-range {
     font-size: 1em;
     color: #999999;
-    margin-bottom: 10px;
   }
 
   .item-tags-wrapper {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
     margin-bottom: 10px;
   }
 
@@ -43,26 +42,27 @@ export const StyledExperienceItem = styled.div`
     border-radius: 10px;
     padding: 3px 10px;
     margin-right: 10px;
+    margin-top: 10px;
   }
 
-  .tag-startup {
-    background: #7b9379;
+  .tag-conservation {
+    background: #7f9379;
   }
 
-  .tag-software {
-    background: #797f93;
+  .tag-education {
+    background: #16548a;
+  }
+
+  .tag-entrepreneurship {
+    background: #a35740;
   }
 
   .tag-retail {
     background: #8c7993;
   }
 
-  .tag-government {
-    background: #16548a;
-  }
-
-  .tag-education {
-    background: #16548a;
+  .tag-software {
+    background: #797f93;
   }
 
   .item-expand-wrapper {
