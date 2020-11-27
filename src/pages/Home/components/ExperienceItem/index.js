@@ -10,6 +10,7 @@ const ExperienceItem = ({ item, setItemExpanded, setItemCollapsed }) => {
     isOpen,
     title,
     organization,
+    organization_url,
     organization_description,
     role_description,
     start_date,
@@ -41,7 +42,15 @@ const ExperienceItem = ({ item, setItemExpanded, setItemCollapsed }) => {
     <StyledExperienceItem isOpen={isOpen}>
       <div className="item-title-wrapper">
         <div className="item-title">
-          {title} @ {organization}
+          {title} @{" "}
+          <a
+            className="organization-link"
+            href={organization_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {organization}
+          </a>
         </div>
         <div className="item-location">{item.location}</div>
       </div>

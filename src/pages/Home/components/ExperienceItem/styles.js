@@ -19,6 +19,10 @@ export const StyledExperienceItem = styled.div`
     color: #555555;
   }
 
+  .organization-link {
+    color: #555555;
+  }
+
   .item-location {
     font-size: 1em;
     color: #999999;
@@ -46,23 +50,23 @@ export const StyledExperienceItem = styled.div`
   }
 
   .tag-conservation {
-    background: #7f9379;
+    background: #5a739c;
   }
 
   .tag-education {
-    background: #16548a;
+    background: #5c989c;
   }
 
   .tag-entrepreneurship {
-    background: #a35740;
+    background: #628a64;
   }
 
   .tag-retail {
-    background: #8c7993;
+    background: #8f6356;
   }
 
   .tag-software {
-    background: #797f93;
+    background: #7d5c80;
   }
 
   .item-expand-wrapper {
