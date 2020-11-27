@@ -1,7 +1,9 @@
 import React from "react";
 import { Spin } from "antd";
+import { useMediaQuery } from "react-responsive";
 
 import MultiSelectFilter from "../../../../components/MultiSelectFilter";
+import RadioFilter from "../../../../components/RadioFilter";
 import ExperienceItem from "../ExperienceItem";
 import { StyledExperiences } from "./styles";
 
@@ -11,14 +13,18 @@ const Experiences = ({
   selectedItem,
   setSelectedItem,
   onUpdateCategories,
+  onUpdateStatus,
 }) => {
   const [experienceItems, setExperienceItems] = React.useState([]);
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
   React.useEffect(() => {
     if (experiences && experiences.length > 0) {
       setExperienceItems(
         experiences.map((item) => ({ ...item, isOpen: false }))
       );
+    } else {
+      setExperienceItems([]);
     }
   }, [experiences]);
 
@@ -79,17 +85,15 @@ const Experiences = ({
               "Retail",
               "Software",
             ]}
-            placement="bottomLeft"
+            placement={isMobile ? "bottomLeft" : "bottomLeft"}
             onUpdateOptions={onUpdateCategories}
           />
-          {/* 
-          <MultiSelectFilter
+          <RadioFilter
             name="Status"
             options={["Complete", "Ongoing", "Planned"]}
             placement={isMobile ? "bottom" : "bottomLeft"}
-            onUpdateOptions={onUpdateStatus}
+            onUpdateSelection={onUpdateStatus}
           />
-          */}
         </div>
       </div>
       <div className="experience-list-wrapper">

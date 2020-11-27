@@ -15,6 +15,8 @@ const Home = () => {
   const [filteredExperiences, setFilteredExperiences] = React.useState(
     experiences
   );
+  const [categories, setCategories] = React.useState([]);
+  const [status, setStatus] = React.useState();
 
   React.useEffect(() => {
     if (experiences && experiences.length > 0) {
@@ -22,22 +24,38 @@ const Home = () => {
     }
   }, [experiences]);
 
-  function onUpdateCategories(newCategories) {
-    console.log("newCategories", newCategories);
+  React.useEffect(() => {
+    let newExperiences = [...experiences];
 
-    if (newCategories.length === 0) {
-      setFilteredExperiences(experiences);
-    } else {
-      setFilteredExperiences(
-        experiences.filter((item) => {
-          return (
-            union(item.tags, newCategories).length <
-            item.tags.length + newCategories.length
-          );
-        })
-      );
+    if (categories.length > 0) {
+      // is this efficient?
+      newExperiences = newExperiences.filter((item) => {
+        return (
+          union(item.tags, categories).length <
+          item.tags.length + categories.length
+        );
+      });
     }
-  }
+
+    if (status && status !== "all") {
+      const today = new Date();
+      if (status === "completed") {
+        newExperiences = newExperiences.filter((item) => {
+          return item.end_date && new Date(item.end_date) < today;
+        });
+      } else if (status === "planned") {
+        newExperiences = newExperiences.filter((item) => {
+          return new Date(item.start_date) > today;
+        });
+      } else {
+        newExperiences = newExperiences.filter((item) => {
+          return item.end_date == null && new Date(item.start_date) < today;
+        });
+      }
+    }
+
+    setFilteredExperiences(newExperiences);
+  }, [experiences, categories, status]);
 
   return (
     <CommonLayout>
@@ -47,7 +65,8 @@ const Home = () => {
           experiences={filteredExperiences}
           selectedItem={selectedItem}
           setSelectedItem={setSelectedItem}
-          onUpdateCategories={onUpdateCategories}
+          onUpdateCategories={setCategories}
+          onUpdateStatus={setStatus}
         />
         {!isMobile && (
           <Map
