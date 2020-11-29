@@ -1,5 +1,6 @@
 import React from "react";
 import MapGL, { FlyToInterpolator, Source, Layer } from "react-map-gl";
+import { filter } from "lodash";
 
 import Marker from "../Marker";
 import { clusterLayer } from "./layers";
@@ -7,14 +8,12 @@ import { StyledMap } from "./styles";
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 const style = "mapbox://styles/mapbox/light-v9";
-const EMPTY_STYLE = {
-  version: 8,
-  sources: {},
-  layers: [],
-};
 
 const Map = ({ experiences, selectedItem, setSelectedItem }) => {
+  const [mapMarkers, setMapMarkers] = React.useState([]);
   const mapContainerRef = React.useRef(null);
+  const mapRef = React.useRef(null);
+
   const [viewport, setViewport] = React.useState({
     width: 0,
     height: 0,
@@ -23,27 +22,25 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
     zoom: 11,
     maxZoom: 16,
   });
+
   const [geojson, setGeojson] = React.useState({});
-
-  console.log(geojson);
-
   React.useEffect(() => {
-    const _geojson = {
+    setGeojson({
       type: "FeatureCollection",
       features: experiences.map(
-        ({ longitude, latitude, marker_organization }) => ({
+        ({ id, longitude, latitude, marker_organization }) => ({
           type: "Feature",
           geometry: {
             type: "Point",
             coordinates: [longitude, latitude],
           },
           properties: {
+            id,
             marker_organization,
           },
         })
       ),
-    };
-    setGeojson(_geojson);
+    });
   }, [experiences]);
 
   React.useEffect(() => {
@@ -60,6 +57,10 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
   }, [selectedItem]);
 
   React.useEffect(() => {
+    console.log(mapMarkers);
+  }, [mapMarkers]);
+
+  React.useEffect(() => {
     function updateViewport() {
       onViewportChange({
         width: mapContainerRef.current.clientWidth + 2,
@@ -71,7 +72,35 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
     return () => window.removeEventListener("resize", updateViewport);
   }, []);
 
+  function updateMarkers() {
+    if (mapRef.current) {
+      const allFeatures = mapRef.current.queryRenderedFeatures();
+      const filteredFeatures = filter(allFeatures, (item) => {
+        return (
+          item.type === "Feature" &&
+          item.layer &&
+          item.layer.id === "item-circle"
+        );
+      });
+
+      const newMarkers = filteredFeatures.map((feature) => {
+        const [longitude, latitude] = feature.geometry.coordinates;
+        const { id, marker_organization } = feature.properties;
+
+        return {
+          longitude,
+          latitude,
+          marker_organization,
+          experience_id: id,
+        };
+      });
+
+      setMapMarkers(newMarkers);
+    }
+  }
+
   function onViewportChange(newViewport) {
+    updateMarkers();
     setViewport((oldViewport) => ({
       ...oldViewport,
       ...newViewport,
@@ -81,6 +110,7 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
   return (
     <StyledMap ref={mapContainerRef}>
       <MapGL
+        ref={mapRef}
         mapboxApiAccessToken={MAPBOX_TOKEN}
         {...viewport}
         mapStyle={style}
@@ -95,14 +125,47 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
           clusterRadius={50}
         >
           <Layer
-            id="point"
+            id="item-circle"
             type="circle"
+            source="map-source"
             paint={{
-              "circle-radius": 10,
+              "circle-radius": 0,
+              "circle-color": "red",
+            }}
+            filter={["!=", "cluster", true]}
+          />
+          <Layer
+            id="cluster-circle"
+            type="circle"
+            source="map-source"
+            paint={{
+              "circle-radius": 16,
               "circle-color": "#007cbf",
             }}
+            filter={["==", "cluster", true]}
+          />
+          <Layer
+            id="cluster-text"
+            type="symbol"
+            source="map-source"
+            layout={{
+              "text-field": "cluster!",
+            }}
+            paint={{ "text-color": "black" }}
+            filter={["==", "cluster", true]}
           />
         </Source>
+
+        {mapMarkers.map((item) => (
+          <Marker
+            key={item.id}
+            item={item}
+            isSelected={selectedItem && selectedItem.id === item.id}
+            setSelectedItem={setSelectedItem}
+          >
+            <div>marker_organization</div>
+          </Marker>
+        ))}
       </MapGL>
     </StyledMap>
   );

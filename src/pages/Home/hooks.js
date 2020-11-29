@@ -15,7 +15,6 @@ export const useExperiences = () => {
       );
       setIsLoading(false);
       if (response) {
-        console.log(response.results);
         setExperiences(
           response.results.map(({ id, data }) => ({
             id,
