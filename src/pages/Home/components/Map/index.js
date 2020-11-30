@@ -3,12 +3,13 @@ import MapGL, { FlyToInterpolator, Source, Layer } from "react-map-gl";
 import { filter, uniqBy } from "lodash";
 
 import { ClusterMarker, ItemMarker } from "../Marker";
+import { clusterLayer, itemLayer } from "./layers";
 import { StyledMap } from "./styles";
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 const style = "mapbox://styles/mapbox/light-v9";
 
-const Map = ({ experiences, selectedItem, setSelectedItem }) => {
+const Map = ({ mapWidth, experiences, selectedItem, setSelectedItem }) => {
   const [clusterMarkers, setClusterMarkers] = React.useState([]);
   const [itemMarkers, setItemMarkers] = React.useState([]);
   const [geojson, setGeojson] = React.useState({});
@@ -58,20 +59,14 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
     }
   }, [selectedItem]);
 
-  // after first render, add resize handler to change viewport
+  // resize map when new mapWidth passed from parent component
   React.useEffect(() => {
-    function updateViewport() {
-      setViewport((oldViewport) => ({
-        ...oldViewport,
-        width: mapContainerRef.current.clientWidth + 2,
-        height: mapContainerRef.current.clientHeight,
-      }));
-    }
-
-    window.addEventListener("resize", updateViewport);
-    updateViewport();
-    return () => window.removeEventListener("resize", updateViewport);
-  }, []);
+    setViewport((oldViewport) => ({
+      ...oldViewport,
+      width: mapWidth,
+      height: mapContainerRef.current.clientHeight,
+    }));
+  }, [mapWidth]);
 
   React.useEffect(() => {
     // can't figure out how to do a source.onLoad callback so this
@@ -162,26 +157,8 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
           clusterMaxZoom={16}
           clusterRadius={50}
         >
-          <Layer
-            id="item" // use layer.js
-            type="circle"
-            source="map-source"
-            paint={{
-              "circle-radius": 0,
-              "circle-color": "red",
-            }}
-            filter={["!=", "cluster", true]}
-          />
-          <Layer
-            id="cluster"
-            type="circle"
-            source="map-source"
-            paint={{
-              "circle-radius": 0,
-              "circle-color": "#FFFFFF",
-            }}
-            filter={["==", "cluster", true]}
-          />
+          <Layer {...itemLayer} />
+          <Layer {...clusterLayer} />
         </Source>
 
         {itemMarkers.map((item) => (

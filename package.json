@@ -16,6 +16,7 @@
     "react-map-gl": "^5.2.10",
     "react-responsive": "^8.1.1",
     "react-scripts": "3.4.1",
+    "react-split-pane": "^0.1.92",
     "react-spring": "^8.0.27",
     "react-use": "^15.3.4",
     "resize-observer-polyfill": "^1.5.1",

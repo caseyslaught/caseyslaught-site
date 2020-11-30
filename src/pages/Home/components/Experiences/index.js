@@ -17,6 +17,7 @@ const Experiences = ({
 }) => {
   const [experienceItems, setExperienceItems] = React.useState([]);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  const itemListRef = React.useRef();
   const itemRefs = React.useRef({});
 
   React.useEffect(() => {
@@ -42,7 +43,13 @@ const Experiences = ({
       });
 
       if (selectedItem.how === "map") {
-        itemRefs.current[selectedItem.item.id].scrollIntoView();
+        const { index } = itemRefs.current[selectedItem.item.id]; // itemRef
+        const itemHeight = 155;
+        itemListRef.current.scrollTo({
+          top: index * itemHeight,
+          left: 0,
+          behavior: "smooth",
+        });
       }
     } else {
       setExperienceItems((prevExperiences) => {
@@ -84,6 +91,16 @@ const Experiences = ({
     });
   };
 
+  // debug
+  React.useEffect(() => {
+    function logScroll() {
+      //console.log(itemListRef.current.scrollTop);
+    }
+
+    itemListRef.current.addEventListener("scroll", logScroll);
+    return window.removeEventListener("resize", logScroll);
+  }, []);
+
   return (
     <StyledExperiences isLoading={isLoading}>
       <div className="experience-header-wrapper">
@@ -109,12 +126,17 @@ const Experiences = ({
           />
         </div>
       </div>
-      <div className="experience-list-wrapper">
+      <div className="experience-list-wrapper" ref={itemListRef}>
         {isLoading ? (
           <Spin />
         ) : (
-          experienceItems.map((item) => (
-            <div key={item.id} ref={(ref) => (itemRefs.current[item.id] = ref)}>
+          experienceItems.map((item, index) => (
+            <div
+              key={item.id}
+              ref={(itemRef) =>
+                (itemRefs.current[item.id] = { itemRef, index })
+              }
+            >
               <ExperienceItem
                 item={item}
                 isSelected={selectedItem && selectedItem.item.id === item.id}
