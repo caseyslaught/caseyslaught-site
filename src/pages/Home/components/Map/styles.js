@@ -4,4 +4,11 @@ export const StyledMap = styled.div`
   flex: 3;
   min-width: 0;
   border-left: 1px solid #cccccc;
+
+  .map-marker {
+    border-radius: 5px;
+    background: white;
+    border: 1px solid #cccccc;
+    padding: 5px 10px;
+  }
 `;

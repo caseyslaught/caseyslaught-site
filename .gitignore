@@ -1,6 +1,7 @@
 
 .vscode/
 *.env
+notes.txt
 
 # dependencies
 /node_modules

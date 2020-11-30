@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { animated } from "react-spring";
 
 export const StyledExperienceItem = styled.div`
   display: flex;
@@ -20,6 +19,10 @@ export const StyledExperienceItem = styled.div`
     color: #555555;
   }
 
+  .organization-link {
+    color: #555555;
+  }
+
   .item-location {
     font-size: 1em;
     color: #999999;
@@ -29,12 +32,11 @@ export const StyledExperienceItem = styled.div`
   .item-date-range {
     font-size: 1em;
     color: #999999;
-    margin-bottom: 10px;
   }
 
   .item-tags-wrapper {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
     margin-bottom: 10px;
   }
 
@@ -44,22 +46,27 @@ export const StyledExperienceItem = styled.div`
     border-radius: 10px;
     padding: 3px 10px;
     margin-right: 10px;
+    margin-top: 10px;
   }
 
-  .tag-startup {
-    background: #7b9379;
+  .tag-conservation {
+    background: #5a739c;
   }
 
-  .tag-software {
-    background: #797f93;
+  .tag-education {
+    background: #5c989c;
+  }
+
+  .tag-entrepreneurship {
+    background: #628a64;
   }
 
   .tag-retail {
-    background: #8c7993;
+    background: #8f6356;
   }
 
-  .tag-government {
-    background: #16548a;
+  .tag-software {
+    background: #7d5c80;
   }
 
   .item-expand-wrapper {
@@ -72,11 +79,18 @@ export const StyledExperienceItem = styled.div`
     color: #aaaaaa;
     font-size: 0.8em;
   }
-`;
 
-export const StyledContent = styled(animated.div)`
-  overflow: hidden;
-  font-size: 1em;
-  color: #555555;
-  margin-bottom: ${(props) => (props.isOpen ? "20px" : "0px")};
+  .expanded-content {
+    overflow: hidden;
+    font-size: 1em;
+    color: #555555;
+    margin-bottom: ${(props) => (props.isOpen ? "20px" : "0px")};
+  }
+
+  .organization-description {
+    margin-bottom: 10px;
+  }
+
+  .role-list {
+  }
 `;
