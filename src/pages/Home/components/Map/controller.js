@@ -1,13 +1,13 @@
 import { MapController } from "react-map-gl";
 
-export default class CustomMapController extends MapController {
-  constructor(onPan) {
+export default class MyMapController extends MapController {
+  constructor(handlePanEnd) {
     super();
-    this.handlePan = onPan;
+    this.handlePanEnd = handlePanEnd;
   }
 
-  _onPan(event) {
-    this.handlePan();
-    console.log(this.getMapState());
+  _onPanEnd(event) {
+    MapController.prototype._onPanEnd.call(this);
+    this.handlePanEnd();
   }
 }

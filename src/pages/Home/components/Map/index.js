@@ -1,19 +1,17 @@
 import React from "react";
 import MapGL, { FlyToInterpolator, Source, Layer } from "react-map-gl";
-import { filter } from "lodash";
+import { filter, uniqBy } from "lodash";
 
-import Marker from "../Marker";
-import { clusterLayer } from "./layers";
+import { ClusterMarker, ItemMarker } from "../Marker";
 import { StyledMap } from "./styles";
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 const style = "mapbox://styles/mapbox/light-v9";
 
 const Map = ({ experiences, selectedItem, setSelectedItem }) => {
-  const [mapMarkers, setMapMarkers] = React.useState([]);
-  const mapContainerRef = React.useRef(null);
-  const mapRef = React.useRef(null);
-
+  const [clusterMarkers, setClusterMarkers] = React.useState([]);
+  const [itemMarkers, setItemMarkers] = React.useState([]);
+  const [geojson, setGeojson] = React.useState({});
   const [viewport, setViewport] = React.useState({
     width: 0,
     height: 0,
@@ -23,7 +21,10 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
     maxZoom: 16,
   });
 
-  const [geojson, setGeojson] = React.useState({});
+  const mapContainerRef = React.useRef(null);
+  const mapRef = React.useRef(null);
+
+  // update geojson when experiences change
   React.useEffect(() => {
     setGeojson({
       type: "FeatureCollection",
@@ -43,68 +44,102 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
     });
   }, [experiences]);
 
+  // update viewport when selectedItem changes, zoom to that item
   React.useEffect(() => {
     if (selectedItem) {
       setViewport((oldViewport) => ({
         ...oldViewport,
-        longitude: selectedItem.longitude,
-        latitude: selectedItem.latitude,
-        zoom: 12,
-        transitionInterpolator: new FlyToInterpolator({ speed: 1.2 }),
+        longitude: selectedItem.item.longitude,
+        latitude: selectedItem.item.latitude,
+        zoom: 14,
+        transitionInterpolator: new FlyToInterpolator({ speed: 1.3 }),
         transitionDuration: "auto",
       }));
     }
   }, [selectedItem]);
 
-  React.useEffect(() => {
-    console.log(mapMarkers);
-  }, [mapMarkers]);
-
+  // after first render, add resize handler to change viewport
   React.useEffect(() => {
     function updateViewport() {
-      onViewportChange({
+      setViewport((oldViewport) => ({
+        ...oldViewport,
         width: mapContainerRef.current.clientWidth + 2,
         height: mapContainerRef.current.clientHeight,
-      });
+      }));
     }
+
     window.addEventListener("resize", updateViewport);
     updateViewport();
     return () => window.removeEventListener("resize", updateViewport);
   }, []);
 
+  React.useEffect(() => {
+    // can't figure out how to do a source.onLoad callback so this
+    // is the ugly workaround...
+    setTimeout(function () {
+      updateMarkers();
+    }, 200);
+  }, [geojson]);
+
   function updateMarkers() {
     if (mapRef.current) {
       const allFeatures = mapRef.current.queryRenderedFeatures();
-      const filteredFeatures = filter(allFeatures, (item) => {
+      const items = filter(allFeatures, (item) => {
         return (
-          item.type === "Feature" &&
-          item.layer &&
-          item.layer.id === "item-circle"
+          item.type === "Feature" && item.layer && item.layer.id === "item"
         );
       });
 
-      const newMarkers = filteredFeatures.map((feature) => {
+      const clusters = filter(allFeatures, (item) => {
+        return (
+          item.type === "Feature" && item.layer && item.layer.id === "cluster"
+        );
+      });
+
+      const itemMarkers = items.map((feature) => {
         const [longitude, latitude] = feature.geometry.coordinates;
         const { id, marker_organization } = feature.properties;
-
         return {
+          id,
           longitude,
           latitude,
           marker_organization,
-          experience_id: id,
         };
       });
 
-      setMapMarkers(newMarkers);
+      const clusterMarkers = clusters.map((cluster) => {
+        const { id, geometry, properties } = cluster;
+        const [longitude, latitude] = geometry.coordinates;
+        const { point_count_abbreviated } = properties;
+        return {
+          id,
+          longitude,
+          latitude,
+          count: point_count_abbreviated,
+        };
+      });
+
+      setClusterMarkers(uniqBy(clusterMarkers, "id"));
+      setItemMarkers(uniqBy(itemMarkers, "id"));
     }
   }
 
   function onViewportChange(newViewport) {
-    updateMarkers();
     setViewport((oldViewport) => ({
       ...oldViewport,
       ...newViewport,
     }));
+    updateMarkers();
+  }
+
+  function onClusterClick(longitude, latitude) {
+    onViewportChange({
+      longitude,
+      latitude,
+      zoom: viewport.zoom + 2,
+      transitionInterpolator: new FlyToInterpolator({ speed: 1.3 }),
+      transitionDuration: "auto",
+    });
   }
 
   return (
@@ -115,6 +150,9 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
         {...viewport}
         mapStyle={style}
         onViewportChange={(newViewport) => onViewportChange(newViewport)}
+        onLoad={() => {
+          updateMarkers();
+        }}
       >
         <Source
           id="map-source"
@@ -125,7 +163,7 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
           clusterRadius={50}
         >
           <Layer
-            id="item-circle"
+            id="item" // use layer.js
             type="circle"
             source="map-source"
             paint={{
@@ -135,62 +173,42 @@ const Map = ({ experiences, selectedItem, setSelectedItem }) => {
             filter={["!=", "cluster", true]}
           />
           <Layer
-            id="cluster-circle"
+            id="cluster"
             type="circle"
             source="map-source"
             paint={{
-              "circle-radius": 16,
-              "circle-color": "#007cbf",
+              "circle-radius": 0,
+              "circle-color": "#FFFFFF",
             }}
-            filter={["==", "cluster", true]}
-          />
-          <Layer
-            id="cluster-text"
-            type="symbol"
-            source="map-source"
-            layout={{
-              "text-field": "cluster!",
-            }}
-            paint={{ "text-color": "black" }}
             filter={["==", "cluster", true]}
           />
         </Source>
 
-        {mapMarkers.map((item) => (
-          <Marker
+        {itemMarkers.map((item) => (
+          <ItemMarker
             key={item.id}
             item={item}
-            isSelected={selectedItem && selectedItem.id === item.id}
+            isSelected={
+              selectedItem &&
+              selectedItem.item &&
+              selectedItem.item.id === item.id
+            }
             setSelectedItem={setSelectedItem}
-          >
-            <div>marker_organization</div>
-          </Marker>
+          />
         ))}
-      </MapGL>
-    </StyledMap>
-  );
 
-  /*
-  return (
-    <StyledMap ref={mapContainerRef}>
-      <MapGL
-        mapboxApiAccessToken={MAPBOX_TOKEN}
-        {...viewport}
-        mapStyle={style}
-        onViewportChange={(newViewport) => onViewportChange(newViewport)}
-      >
-        {experiences.map((item) => (
-          <Marker
-            key={item.id}
-            item={item}
-            isSelected={selectedItem && selectedItem.id === item.id}
-            setSelectedItem={setSelectedItem}
+        {clusterMarkers.map(({ id, count, longitude, latitude }) => (
+          <ClusterMarker
+            key={id}
+            count={count}
+            longitude={longitude}
+            latitude={latitude}
+            onClick={() => onClusterClick(longitude, latitude)}
           />
         ))}
       </MapGL>
     </StyledMap>
   );
-  */
 };
 
 export default Map;
