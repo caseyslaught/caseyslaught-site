@@ -17,7 +17,7 @@ export const useExperiences = () => {
       if (response) {
         setExperiences(
           response.results.map(({ id, data }) => ({
-            id,
+            id: id,
             title: data.title[0].text,
             organization: data.organization[0].text,
             marker_organization: data.marker_organization[0].text,

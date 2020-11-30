@@ -17,11 +17,15 @@ const Experiences = ({
 }) => {
   const [experienceItems, setExperienceItems] = React.useState([]);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  const itemRefs = React.useRef({});
 
   React.useEffect(() => {
     if (experiences && experiences.length > 0) {
       setExperienceItems(
-        experiences.map((item) => ({ ...item, isOpen: false }))
+        experiences.map((item) => ({
+          ...item,
+          isOpen: false,
+        }))
       );
     } else {
       setExperienceItems([]);
@@ -33,9 +37,13 @@ const Experiences = ({
       setExperienceItems((prevExperiences) => {
         return prevExperiences.map((item) => ({
           ...item,
-          isOpen: item.id === selectedItem.id,
+          isOpen: item.id === selectedItem.item.id,
         }));
       });
+
+      if (selectedItem.how === "map") {
+        itemRefs.current[selectedItem.item.id].scrollIntoView();
+      }
     } else {
       setExperienceItems((prevExperiences) => {
         return prevExperiences.map((item) => ({
@@ -47,9 +55,14 @@ const Experiences = ({
   }, [selectedItem]);
 
   const setItemExpanded = (targetItem) => {
-    if (selectedItem === null || targetItem.id !== selectedItem.id) {
-      setSelectedItem(targetItem);
+    if (
+      selectedItem === null ||
+      selectedItem.item === null ||
+      targetItem.id !== selectedItem.item.id
+    ) {
+      setSelectedItem({ item: targetItem, how: "list" });
     }
+
     setExperienceItems((prevExperiences) => {
       return prevExperiences.map((item) => ({
         ...item,
@@ -101,13 +114,14 @@ const Experiences = ({
           <Spin />
         ) : (
           experienceItems.map((item) => (
-            <ExperienceItem
-              key={item.id}
-              item={item}
-              isSelected={selectedItem && selectedItem.id === item.id}
-              setItemExpanded={setItemExpanded}
-              setItemCollapsed={setItemCollapsed}
-            />
+            <div key={item.id} ref={(ref) => (itemRefs.current[item.id] = ref)}>
+              <ExperienceItem
+                item={item}
+                isSelected={selectedItem && selectedItem.item.id === item.id}
+                setItemExpanded={setItemExpanded}
+                setItemCollapsed={setItemCollapsed}
+              />
+            </div>
           ))
         )}
       </div>

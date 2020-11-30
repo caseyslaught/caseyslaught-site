@@ -1,27 +1,35 @@
 import React from "react";
 import { Marker as MapBoxMarker } from "react-map-gl";
 
-import { StyledMarker } from "./styles";
+import { StyledClusterMarker, StyledItemMarker } from "./styles";
 
-const Marker = ({ item, isSelected, setSelectedItem }) => {
+export const ClusterMarker = ({ count, longitude, latitude, onClick }) => {
+  return (
+    <MapBoxMarker latitude={latitude} longitude={longitude} captureClick={true}>
+      <StyledClusterMarker
+        onClick={onClick}
+      >{`(${count})`}</StyledClusterMarker>
+    </MapBoxMarker>
+  );
+};
+
+export const ItemMarker = ({ item, isSelected, setSelectedItem }) => {
   const { marker_organization, longitude, latitude } = item;
 
   return (
     <MapBoxMarker latitude={latitude} longitude={longitude} captureClick={true}>
-      <StyledMarker
+      <StyledItemMarker
         isSelected={isSelected}
         onClick={() => {
           if (!isSelected) {
-            setSelectedItem(item);
+            setSelectedItem({ item, how: "map" });
           } else {
             setSelectedItem(null);
           }
         }}
       >
         {marker_organization}
-      </StyledMarker>
+      </StyledItemMarker>
     </MapBoxMarker>
   );
 };
-
-export default Marker;

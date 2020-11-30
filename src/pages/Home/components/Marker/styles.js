@@ -1,10 +1,19 @@
 import styled from "styled-components";
 
-export const StyledMarker = styled.div`
+export const StyledClusterMarker = styled.div`
   border: 1px solid #cccccc;
-  border-radius: 0px 10px 10px 10px;
+  border-radius: 15px;
   padding: 5px 10px;
 
-  background: ${(props) => (props.isSelected ? "#999999" : "white")};
-  color: ${(props) => (props.isSelected ? "white" : "#555555")};
+  background: white;
+  color: "#555555";
+`;
+
+export const StyledItemMarker = styled.div`
+  border: ${(props) =>
+    props.isSelected ? "2px solid #aaaaaa" : "1px solid #cccccc;"};
+  border-radius: 0px 10px 10px 10px;
+  padding: 5px 10px;
+  background: white;
+  color: ${(props) => (props.isSelected ? "#333333" : "#555555")};
 `;
