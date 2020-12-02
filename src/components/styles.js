@@ -10,8 +10,4 @@ export const StyledFilter = styled.div`
     padding: 3px 10px;
     margin-right: 10px;
   }
-
-  .casey {
-    margin-left: 10px;
-  }
 `;

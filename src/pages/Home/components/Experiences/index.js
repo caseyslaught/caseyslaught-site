@@ -17,8 +17,12 @@ const Experiences = ({
 }) => {
   const [experienceItems, setExperienceItems] = React.useState([]);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  const headerRef = React.useRef();
   const itemListRef = React.useRef();
   const itemRefs = React.useRef({});
+  const [headerFixed, setHeaderFixed] = React.useState(false);
+  const headerOffsetY = React.useRef();
+  const [headerHeight, setHeaderHeight] = React.useState();
 
   React.useEffect(() => {
     if (experiences && experiences.length > 0) {
@@ -61,6 +65,25 @@ const Experiences = ({
     }
   }, [selectedItem]);
 
+  React.useEffect(() => {
+    headerOffsetY.current = headerRef.current.offsetTop;
+    setHeaderHeight(headerRef.current.offsetHeight);
+
+    function handleScroll() {
+      if (
+        itemListRef.current.getBoundingClientRect().top >=
+        headerRef.current.offsetHeight
+      ) {
+        setHeaderFixed(false);
+      } else if (headerRef.current.getBoundingClientRect().top <= 0) {
+        setHeaderFixed(true);
+      }
+    }
+
+    window.addEventListener("scroll", () => handleScroll());
+    return window.removeEventListener("scroll", () => handleScroll());
+  }, []);
+
   const setItemExpanded = (targetItem) => {
     if (
       selectedItem === null ||
@@ -91,19 +114,14 @@ const Experiences = ({
     });
   };
 
-  // debug
-  React.useEffect(() => {
-    function logScroll() {
-      //console.log(itemListRef.current.scrollTop);
-    }
-
-    itemListRef.current.addEventListener("scroll", logScroll);
-    return window.removeEventListener("resize", logScroll);
-  }, []);
-
   return (
-    <StyledExperiences isLoading={isLoading}>
-      <div className="experience-header-wrapper">
+    <StyledExperiences
+      isLoading={isLoading}
+      isMobile={isMobile}
+      headerFixed={headerFixed}
+      headerHeight={headerHeight}
+    >
+      <div className="experience-header-wrapper" ref={headerRef}>
         <h3 className="experience-title">Experiences</h3>
         <div className="experience-filter-wrapper">
           <MultiSelectFilter

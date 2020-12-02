@@ -12,6 +12,12 @@ export const StyledExperiences = styled.div`
     margin: 0px;
     padding: 20px;
     border-bottom: 1px solid #cccccc;
+    background: ${(props) => (props.headerFixed ? "#fafafa" : "inherit")};
+    z-index: 100;
+
+    position: ${(props) => (props.headerFixed ? "fixed" : "static")};
+    width: ${(props) => (props.headerFixed ? "100%" : "auto")};
+    top: 0;
   }
 
   .experience-title {
@@ -32,7 +38,7 @@ export const StyledExperiences = styled.div`
     align-items: ${(props) => (props.isLoading ? "center" : "stretch")};
     justify-content: ${(props) => (props.isLoading ? "center" : "flex-start")};
 
-    overflow-y: scroll;
+    overflow-y: ${(props) => (props.isMobile ? "visible" : "scroll")};
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     ::-webkit-scrollbar {
@@ -40,5 +46,8 @@ export const StyledExperiences = styled.div`
       width: 0;
       height: 0;
     }
+
+    margin-top: ${(props) =>
+      props.headerFixed ? `${props.headerHeight}px` : "0px"};
   }
 `;

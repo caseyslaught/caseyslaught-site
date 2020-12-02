@@ -34,6 +34,8 @@ const MultiSelectFilter = ({
       placeholder={placeholder}
       defaultValue={[]}
       onChange={handleOnChange}
+      onFocus={() => console.log("focus, now blur")}
+      onBlur={() => console.log("blurred")}
     >
       {selectOptions}
     </Select>

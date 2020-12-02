@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const StyledLayout = styled.div`
-  height: 100%;
+  height: ${(props) => (props.isMobile ? "auto" : "100%")};
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -9,7 +9,7 @@ export const StyledLayout = styled.div`
 
   text-align: center;
   padding: ${(props) =>
-    props.isMobile ? "5px 5px 60px 5px" : "20px 20px 60px 20px"};
+    props.isMobile ? "5px 10px 0px 10px" : "20px 20px 60px 20px"};
 
   .title-wrapper {
     width: 100%;
