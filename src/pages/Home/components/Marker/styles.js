@@ -12,7 +12,7 @@ export const StyledClusterMarker = styled.div`
 export const StyledItemMarker = styled.div`
   border: ${(props) =>
     props.isSelected ? "2px solid #aaaaaa" : "1px solid #cccccc;"};
-  border-radius: 0px 10px 10px 10px;
+  border-radius: 10px;
   padding: 5px 10px;
   background: white;
   color: ${(props) => (props.isSelected ? "#333333" : "#555555")};

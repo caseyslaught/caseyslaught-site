@@ -17,7 +17,12 @@ const Experiences = ({
 }) => {
   const [experienceItems, setExperienceItems] = React.useState([]);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  const headerRef = React.useRef();
+  const itemListRef = React.useRef();
   const itemRefs = React.useRef({});
+  const [headerFixed, setHeaderFixed] = React.useState(false);
+  const headerOffsetY = React.useRef();
+  const [headerHeight, setHeaderHeight] = React.useState();
 
   React.useEffect(() => {
     if (experiences && experiences.length > 0) {
@@ -42,7 +47,13 @@ const Experiences = ({
       });
 
       if (selectedItem.how === "map") {
-        itemRefs.current[selectedItem.item.id].scrollIntoView();
+        const { index } = itemRefs.current[selectedItem.item.id]; // itemRef
+        const itemHeight = 155;
+        itemListRef.current.scrollTo({
+          top: index * itemHeight,
+          left: 0,
+          behavior: "smooth",
+        });
       }
     } else {
       setExperienceItems((prevExperiences) => {
@@ -53,6 +64,25 @@ const Experiences = ({
       });
     }
   }, [selectedItem]);
+
+  React.useEffect(() => {
+    headerOffsetY.current = headerRef.current.offsetTop;
+    setHeaderHeight(headerRef.current.offsetHeight);
+
+    function handleScroll() {
+      if (
+        itemListRef.current.getBoundingClientRect().top >=
+        headerRef.current.offsetHeight
+      ) {
+        setHeaderFixed(false);
+      } else if (headerRef.current.getBoundingClientRect().top <= 0) {
+        setHeaderFixed(true);
+      }
+    }
+
+    window.addEventListener("scroll", () => handleScroll());
+    return window.removeEventListener("scroll", () => handleScroll());
+  }, []);
 
   const setItemExpanded = (targetItem) => {
     if (
@@ -85,8 +115,13 @@ const Experiences = ({
   };
 
   return (
-    <StyledExperiences isLoading={isLoading}>
-      <div className="experience-header-wrapper">
+    <StyledExperiences
+      isLoading={isLoading}
+      isMobile={isMobile}
+      headerFixed={headerFixed}
+      headerHeight={headerHeight}
+    >
+      <div className="experience-header-wrapper" ref={headerRef}>
         <h3 className="experience-title">Experiences</h3>
         <div className="experience-filter-wrapper">
           <MultiSelectFilter
@@ -109,12 +144,17 @@ const Experiences = ({
           />
         </div>
       </div>
-      <div className="experience-list-wrapper">
+      <div className="experience-list-wrapper" ref={itemListRef}>
         {isLoading ? (
           <Spin />
         ) : (
-          experienceItems.map((item) => (
-            <div key={item.id} ref={(ref) => (itemRefs.current[item.id] = ref)}>
+          experienceItems.map((item, index) => (
+            <div
+              key={item.id}
+              ref={(itemRef) =>
+                (itemRefs.current[item.id] = { itemRef, index })
+              }
+            >
               <ExperienceItem
                 item={item}
                 isSelected={selectedItem && selectedItem.item.id === item.id}

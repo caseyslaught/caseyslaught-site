@@ -1,6 +1,7 @@
 import React from "react";
 import { useMediaQuery } from "react-responsive";
 import { union } from "lodash";
+import SplitPane from "react-split-pane";
 
 import CommonLayout from "../../layouts/CommonLayout";
 import Experiences from "./components/Experiences";
@@ -9,6 +10,7 @@ import { StyledHome } from "./styles";
 import { useExperiences } from "./hooks";
 
 const Home = () => {
+  const [mapWidth, setMapWidth] = React.useState(window.innerWidth / 2);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const [selectedItem, setSelectedItem] = React.useState(null);
   const { experiences, isLoading } = useExperiences();
@@ -57,6 +59,55 @@ const Home = () => {
     setFilteredExperiences(newExperiences);
   }, [experiences, categories, status]);
 
+  if (isMobile) {
+    return (
+      <CommonLayout>
+        <StyledHome isMobile={isMobile}>
+          <Experiences
+            isLoading={isLoading}
+            experiences={filteredExperiences}
+            selectedItem={selectedItem}
+            setSelectedItem={setSelectedItem}
+            onUpdateCategories={setCategories}
+            onUpdateStatus={setStatus}
+          />
+        </StyledHome>
+      </CommonLayout>
+    );
+  } else {
+    return (
+      <CommonLayout>
+        <StyledHome isMobile={isMobile}>
+          <SplitPane
+            split="vertical"
+            primary="second"
+            minSize={500}
+            maxSize={900}
+            defaultSize={window.innerWidth / 2}
+            onChange={(width) => setMapWidth(width)}
+            style={{ position: "static" }}
+          >
+            <Experiences
+              isLoading={isLoading}
+              experiences={filteredExperiences}
+              selectedItem={selectedItem}
+              setSelectedItem={setSelectedItem}
+              onUpdateCategories={setCategories}
+              onUpdateStatus={setStatus}
+            />
+            <Map
+              mapWidth={mapWidth}
+              experiences={filteredExperiences}
+              selectedItem={selectedItem}
+              setSelectedItem={setSelectedItem}
+            />
+          </SplitPane>
+        </StyledHome>
+      </CommonLayout>
+    );
+  }
+
+  /*
   return (
     <CommonLayout>
       <StyledHome isMobile={isMobile}>
@@ -78,6 +129,7 @@ const Home = () => {
       </StyledHome>
     </CommonLayout>
   );
+  */
 };
 
 export default Home;
