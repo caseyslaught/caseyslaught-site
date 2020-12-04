@@ -29,39 +29,63 @@ const Map = ({ mapWidth, experiences, selectedItem, setSelectedItem }) => {
   React.useEffect(() => {
     setGeojson({
       type: "FeatureCollection",
-      features: experiences.map(
-        ({ id, longitude, latitude, marker_organization }) => ({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [longitude, latitude],
-          },
-          properties: {
-            id,
-            marker_organization,
-          },
-        })
-      ),
+      features: experiences.map(({ id, longitude, latitude, marker_text }) => ({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [longitude, latitude],
+        },
+        properties: {
+          id,
+          marker_text,
+        },
+      })),
     });
   }, [experiences]);
 
   // update viewport when selectedItem changes, zoom to that item
   React.useEffect(() => {
     if (selectedItem) {
-      setViewport((oldViewport) => ({
-        ...oldViewport,
-        longitude: selectedItem.item.longitude,
-        latitude: selectedItem.item.latitude,
-        zoom: 14,
-        transitionInterpolator: new FlyToInterpolator({ speed: 1.3 }),
-        transitionDuration: "auto",
-      }));
+      // if only interpolating zoom, then it crashes (math.gl problem)
+      // https://github.com/visgl/react-map-gl/issues/969
+
+      const {
+        longitude: selectedLongitude,
+        latitude: selectedLatitude,
+      } = selectedItem.item;
+
+      setViewport((oldViewport) => {
+        const {
+          longitude: currentLongitude,
+          latitude: currentLatitude,
+        } = oldViewport;
+
+        if (
+          Math.abs(selectedLatitude - currentLatitude) > 0.03 &&
+          Math.abs(selectedLongitude - currentLongitude) > 0.03
+        ) {
+          return {
+            ...oldViewport,
+            longitude: selectedItem.item.longitude,
+            latitude: selectedItem.item.latitude,
+            zoom: 14,
+            transitionInterpolator: new FlyToInterpolator({ speed: 1.3 }),
+            transitionDuration: "auto",
+          };
+        } else {
+          return {
+            ...oldViewport,
+            longitude: selectedItem.item.longitude,
+            latitude: selectedItem.item.latitude,
+            zoom: 14,
+          };
+        }
+      });
     }
   }, [selectedItem]);
 
   // resize map when new mapWidth passed from parent component
   React.useEffect(() => {
-    console.log("mapWidth", "height: ", mapContainerRef.current.clientHeight);
     setViewport((oldViewport) => ({
       ...oldViewport,
       width: mapWidth,
@@ -94,12 +118,12 @@ const Map = ({ mapWidth, experiences, selectedItem, setSelectedItem }) => {
 
       const itemMarkers = items.map((feature) => {
         const [longitude, latitude] = feature.geometry.coordinates;
-        const { id, marker_organization } = feature.properties;
+        const { id, marker_text } = feature.properties;
         return {
           id,
           longitude,
           latitude,
-          marker_organization,
+          marker_text,
         };
       });
 

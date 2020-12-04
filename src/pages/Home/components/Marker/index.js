@@ -14,7 +14,7 @@ export const ClusterMarker = ({ count, longitude, latitude, onClick }) => {
 };
 
 export const ItemMarker = ({ item, isSelected, setSelectedItem }) => {
-  const { marker_organization, longitude, latitude } = item;
+  const { marker_text, longitude, latitude } = item;
 
   return (
     <MapBoxMarker latitude={latitude} longitude={longitude} captureClick={true}>
@@ -28,7 +28,7 @@ export const ItemMarker = ({ item, isSelected, setSelectedItem }) => {
           }
         }}
       >
-        {marker_organization}
+        {marker_text}
       </StyledItemMarker>
     </MapBoxMarker>
   );

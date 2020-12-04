@@ -93,4 +93,9 @@ export const StyledExperienceItem = styled.div`
 
   .role-list {
   }
+
+  .image-wrapper {
+    width: 100%;
+    text-align: center;
+  }
 `;

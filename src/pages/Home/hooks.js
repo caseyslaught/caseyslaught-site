@@ -20,7 +20,7 @@ export const useExperiences = () => {
             id: id,
             title: data.title[0].text,
             organization: data.organization[0].text,
-            marker_organization: data.marker_organization[0].text,
+            marker_text: data.marker_organization[0].text,
             organization_url: data.organization_link.url,
             organization_description: data.organization_description[0].text,
             location: data.location[0].text,
@@ -30,7 +30,7 @@ export const useExperiences = () => {
             tags: data.tags.map((tag) => tag.text),
             latitude: data.coordinates.latitude,
             longitude: data.coordinates.longitude,
-            image: data.image,
+            image_url: "url" in data.image ? data.image.url : null,
           }))
         );
       }

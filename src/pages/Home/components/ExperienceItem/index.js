@@ -2,6 +2,7 @@ import React from "react";
 import { ChevronDown, ChevronUp } from "react-feather";
 import { useSpring, animated } from "react-spring";
 import { useMeasure } from "react-use";
+import { Image } from "antd";
 
 import { StyledExperienceItem } from "./styles";
 
@@ -38,9 +39,13 @@ const ExperienceItem = ({ item, setItemExpanded, setItemCollapsed }) => {
     return window.removeEventListener("resize", setContentHeight(height));
   }, [height]);
 
+  function toggleOpen() {
+    isOpen ? setItemCollapsed(item) : setItemExpanded(item);
+  }
+
   return (
     <StyledExperienceItem isOpen={isOpen}>
-      <div className="item-title-wrapper">
+      <div className="item-title-wrapper" onClick={toggleOpen}>
         <div className="item-title">
           {title} @{" "}
           <a
@@ -68,6 +73,12 @@ const ExperienceItem = ({ item, setItemExpanded, setItemCollapsed }) => {
               <li key={role}>{role}</li>
             ))}
           </ul>
+
+          {item.image_url && (
+            <div className="image-wrapper">
+              <Image src={item.image_url} />
+            </div>
+          )}
         </div>
       </animated.div>
 
