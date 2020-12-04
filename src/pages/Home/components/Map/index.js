@@ -61,6 +61,7 @@ const Map = ({ mapWidth, experiences, selectedItem, setSelectedItem }) => {
 
   // resize map when new mapWidth passed from parent component
   React.useEffect(() => {
+    console.log("mapWidth", "height: ", mapContainerRef.current.clientHeight);
     setViewport((oldViewport) => ({
       ...oldViewport,
       width: mapWidth,

@@ -9,8 +9,12 @@ import Map from "./components/Map";
 import { StyledHome } from "./styles";
 import { useExperiences } from "./hooks";
 
+function getInitialMapWidth() {
+  return (window.innerWidth - 40) / 1.75;
+}
+
 const Home = () => {
-  const [mapWidth, setMapWidth] = React.useState(window.innerWidth / 2);
+  const [mapWidth, setMapWidth] = React.useState(getInitialMapWidth());
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const [selectedItem, setSelectedItem] = React.useState(null);
   const { experiences, isLoading } = useExperiences();
@@ -20,12 +24,20 @@ const Home = () => {
   const [categories, setCategories] = React.useState([]);
   const [status, setStatus] = React.useState();
 
+  // update filtered experiences
   React.useEffect(() => {
     if (experiences && experiences.length > 0) {
       setFilteredExperiences(experiences);
     }
   }, [experiences]);
 
+  React.useEffect(() => {
+    if (!isMobile) {
+      setMapWidth(getInitialMapWidth());
+    }
+  }, [isMobile]);
+
+  // filter experiences
   React.useEffect(() => {
     let newExperiences = [...experiences];
 
@@ -83,7 +95,7 @@ const Home = () => {
             primary="second"
             minSize={500}
             maxSize={900}
-            defaultSize={window.innerWidth / 2}
+            defaultSize={getInitialMapWidth()}
             onChange={(width) => setMapWidth(width)}
             style={{ position: "static" }}
           >
