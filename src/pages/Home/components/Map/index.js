@@ -9,13 +9,20 @@ import { StyledMap } from "./styles";
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 const style = "mapbox://styles/mapbox/light-v9";
 
-const Map = ({ mapWidth, experiences, selectedItem, setSelectedItem }) => {
+const Map = ({
+  mapWidth,
+  experiences,
+  selectedItem,
+  setSelectedItem,
+  setMapWidth,
+}) => {
   const [clusterMarkers, setClusterMarkers] = React.useState([]);
   const [itemMarkers, setItemMarkers] = React.useState([]);
   const [geojson, setGeojson] = React.useState({});
+
   const [viewport, setViewport] = React.useState({
-    width: 0,
-    height: 0,
+    width: 1,
+    height: 1,
     longitude: 30.085963,
     latitude: -1.955151,
     zoom: 11,
@@ -43,56 +50,6 @@ const Map = ({ mapWidth, experiences, selectedItem, setSelectedItem }) => {
     });
   }, [experiences]);
 
-  // update viewport when selectedItem changes, zoom to that item
-  React.useEffect(() => {
-    if (selectedItem) {
-      // if only interpolating zoom, then it crashes (math.gl problem)
-      // https://github.com/visgl/react-map-gl/issues/969
-
-      const {
-        longitude: selectedLongitude,
-        latitude: selectedLatitude,
-      } = selectedItem.item;
-
-      setViewport((oldViewport) => {
-        const {
-          longitude: currentLongitude,
-          latitude: currentLatitude,
-        } = oldViewport;
-
-        if (
-          Math.abs(selectedLatitude - currentLatitude) > 0.03 &&
-          Math.abs(selectedLongitude - currentLongitude) > 0.03
-        ) {
-          return {
-            ...oldViewport,
-            longitude: selectedItem.item.longitude,
-            latitude: selectedItem.item.latitude,
-            zoom: 14,
-            transitionInterpolator: new FlyToInterpolator({ speed: 1.3 }),
-            transitionDuration: "auto",
-          };
-        } else {
-          return {
-            ...oldViewport,
-            longitude: selectedItem.item.longitude,
-            latitude: selectedItem.item.latitude,
-            zoom: 14,
-          };
-        }
-      });
-    }
-  }, [selectedItem]);
-
-  // resize map when new mapWidth passed from parent component
-  React.useEffect(() => {
-    setViewport((oldViewport) => ({
-      ...oldViewport,
-      width: mapWidth,
-      height: mapContainerRef.current.clientHeight,
-    }));
-  }, [mapWidth]);
-
   React.useEffect(() => {
     // can't figure out how to do a source.onLoad callback so this
     // is the ugly workaround...
@@ -100,6 +57,36 @@ const Map = ({ mapWidth, experiences, selectedItem, setSelectedItem }) => {
       updateMarkers();
     }, 200);
   }, [geojson]);
+
+  React.useEffect(() => {
+    function updateMapWidth() {
+      setMapWidth(mapContainerRef.current.clientWidth);
+    }
+
+    window.addEventListener("resize", updateMapWidth);
+    return () => window.removeEventListener("resize", updateMapWidth);
+  }, [setMapWidth]);
+
+  // resize map when new mapWidth passed from parent component
+  // or update viewport when selectedItem changes
+  React.useEffect(() => {
+    if (selectedItem) {
+      setViewport((oldViewport) => ({
+        ...oldViewport,
+        longitude: selectedItem.item.longitude,
+        latitude: selectedItem.item.latitude,
+        zoom: 14,
+        transitionInterpolator: new FlyToInterpolator(),
+        transitionDuration: "auto",
+      }));
+    } else {
+      setViewport((oldViewport) => ({
+        ...oldViewport,
+        width: mapWidth,
+        height: mapContainerRef.current.clientHeight,
+      }));
+    }
+  }, [mapWidth, selectedItem]);
 
   function updateMarkers() {
     if (mapRef.current) {
@@ -162,8 +149,26 @@ const Map = ({ mapWidth, experiences, selectedItem, setSelectedItem }) => {
     });
   }
 
+  function refCallback(node) {
+    // ref height was often incorrect when transitioning from mobile to desktop,
+    // so updating height in ref callback
+    if (node) {
+      mapContainerRef.current = node;
+      if (
+        node.clientHeight !== viewport.height ||
+        node.clientWidth !== viewport.width
+      ) {
+        setViewport((oldViewport) => ({
+          ...oldViewport,
+          height: node.clientHeight,
+          width: node.clientWidth,
+        }));
+      }
+    }
+  }
+
   return (
-    <StyledMap ref={mapContainerRef}>
+    <StyledMap ref={refCallback}>
       <MapGL
         ref={mapRef}
         mapboxApiAccessToken={MAPBOX_TOKEN}

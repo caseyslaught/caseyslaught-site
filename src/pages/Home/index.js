@@ -10,11 +10,12 @@ import { StyledHome } from "./styles";
 import { useExperiences } from "./hooks";
 
 function getInitialMapWidth() {
-  return (window.innerWidth - 40) / 1.75;
+  return (window.innerWidth - 40) / 1.5;
 }
 
 const Home = () => {
   const [mapWidth, setMapWidth] = React.useState(getInitialMapWidth());
+  const [maxMapWidth, setMaxMapWidth] = React.useState(900);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const [selectedItem, setSelectedItem] = React.useState(null);
   const { experiences, isLoading } = useExperiences();
@@ -71,6 +72,16 @@ const Home = () => {
     setFilteredExperiences(newExperiences);
   }, [experiences, categories, status]);
 
+  React.useEffect(() => {
+    updatePaneDimensions();
+    function updatePaneDimensions() {
+      setMaxMapWidth(window.innerWidth - 450);
+    }
+
+    window.addEventListener("resize", updatePaneDimensions);
+    return () => window.removeEventListener("resize", updatePaneDimensions);
+  }, []);
+
   if (isMobile) {
     return (
       <CommonLayout>
@@ -94,7 +105,7 @@ const Home = () => {
             split="vertical"
             primary="second"
             minSize={500}
-            maxSize={900}
+            maxSize={maxMapWidth}
             defaultSize={getInitialMapWidth()}
             onChange={(width) => setMapWidth(width)}
             style={{ position: "static" }}
@@ -109,6 +120,7 @@ const Home = () => {
             />
             <Map
               mapWidth={mapWidth}
+              setMapWidth={setMapWidth}
               experiences={filteredExperiences}
               selectedItem={selectedItem}
               setSelectedItem={setSelectedItem}

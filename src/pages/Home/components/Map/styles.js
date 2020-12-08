@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const StyledMap = styled.div`
   height: 100%;
   min-width: 0;
+  width: 100%;
   border-left: 1px solid #cccccc;
 
   .map-marker {

@@ -18,6 +18,7 @@ const ExperienceItem = ({ item, setItemExpanded, setItemCollapsed }) => {
     end_date,
   } = item;
 
+  // TODO: finish this
   const start_obj = new Date(start_date);
   const start = "Jan " + start_obj.getFullYear();
 
@@ -35,8 +36,11 @@ const ExperienceItem = ({ item, setItemExpanded, setItemCollapsed }) => {
 
   React.useEffect(() => {
     setContentHeight(height);
-    window.addEventListener("resize", setContentHeight(height));
-    return window.removeEventListener("resize", setContentHeight(height));
+    function updateContentHeight() {
+      setContentHeight(height);
+    }
+    window.addEventListener("resize", updateContentHeight);
+    return () => window.removeEventListener("resize", updateContentHeight);
   }, [height]);
 
   function toggleOpen() {
